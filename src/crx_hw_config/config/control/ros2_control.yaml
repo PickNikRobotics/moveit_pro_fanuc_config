@@ -136,5 +136,5 @@ velocity_force_controller:
 
 fanuc_gpio_controller:
   ros__parameters:
-    gpio_config_file_package: fanuc_crx_hw
-    gpio_config_file_path: config/control/example_gpio_config.yaml
+    gpio_config_file_package: crx_hw_config
+    gpio_config_file_path: config/control/gpio_config.yaml

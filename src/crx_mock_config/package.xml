@@ -1,10 +1,11 @@
 <?xml version="1.0" ?>
 <package format="3">
-  <name>fanuc_crx_hw</name>
+  <name>crx_mock_config</name>
   <version>8.6.0</version>
 
   <description>
-    Configuration package for the FANUC CRX manipulator family.
+    Configuration package for the FANUC CRX manipulator family using mock
+    hardware.
   </description>
 
   <maintainer email="support@picknik.ai">MoveIt Pro Maintainer</maintainer>

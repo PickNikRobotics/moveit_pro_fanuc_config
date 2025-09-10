@@ -22,14 +22,14 @@ public:
    * @param shared_resources A shared_ptr to a BehaviorContext that is shared among all Behaviors.
    */
   ActuateGripper(const std::string& name, const BT::NodeConfiguration& config,
-              const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources);
+                 const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources);
 
   /**
    * @brief Constructor for testing with a custom client interface.
    */
   ActuateGripper(const std::string& name, const BT::NodeConfiguration& config,
-              const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources,
-              std::unique_ptr<moveit_studio::behaviors::ClientInterfaceBase<SetBool>> client_interface);
+                 const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources,
+                 std::unique_ptr<moveit_studio::behaviors::ClientInterfaceBase<SetBool>> client_interface);
 
   /**
    * @brief Implementation of the required providedPorts() function.

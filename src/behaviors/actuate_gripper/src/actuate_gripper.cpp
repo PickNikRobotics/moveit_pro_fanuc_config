@@ -1,7 +1,7 @@
 #include <actuate_gripper/actuate_gripper.hpp>
 
-#include "spdlog/spdlog.h"
 #include <moveit_studio_behavior_interface/metadata_fields.hpp>
+#include "spdlog/spdlog.h"
 
 namespace
 {
@@ -26,24 +26,23 @@ inline constexpr auto kDescriptionActuateGripper = R"(
 
 namespace actuate_gripper
 {
-ActuateGripper::ActuateGripper(
-    const std::string& name, const BT::NodeConfiguration& config,
-    const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources)
+ActuateGripper::ActuateGripper(const std::string& name, const BT::NodeConfiguration& config,
+                               const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources)
   : ServiceClientBehaviorBase<SetBool>(name, config, shared_resources)
 {
 }
 
-ActuateGripper::ActuateGripper(
-    const std::string& name, const BT::NodeConfiguration& config,
-    const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources,
-    std::unique_ptr<moveit_studio::behaviors::ClientInterfaceBase<SetBool>> client_interface)
+ActuateGripper::ActuateGripper(const std::string& name, const BT::NodeConfiguration& config,
+                               const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources,
+                               std::unique_ptr<moveit_studio::behaviors::ClientInterfaceBase<SetBool>> client_interface)
   : ServiceClientBehaviorBase<SetBool>(name, config, shared_resources, std::move(client_interface))
 {
 }
 
 BT::PortsList ActuateGripper::providedPorts()
 {
-  return { BT::InputPort<std::string>(kPortIdCommand, "Command string: \"open\" to open the gripper, \"close\" to close it") };
+  return { BT::InputPort<std::string>(kPortIdCommand,
+                                      "Command string: \"open\" to open the gripper, \"close\" to close it") };
 }
 
 BT::KeyValueVector ActuateGripper::metadata()

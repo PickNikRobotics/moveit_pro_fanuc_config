@@ -2,14 +2,13 @@
 <package format="3">
   <name>actuate_gripper</name>
   <version>0.0.0</version>
-  <description>Behavior to actuate a gripper connected to Fanuc CRX hardware using ROS topics from the GPIO controller.</description>
+  <description>
+    Behavior to actuate a gripper connected to Fanuc CRX hardware using ROS
+    topics from the GPIO controller.
+  </description>
 
-  <maintainer email="support@picknik.ai">
-    MoveIt Pro User
-  </maintainer>
-  <author email="support@picknik.ai">
-    MoveIt Pro User
-  </author>
+  <maintainer email="support@picknik.ai">MoveIt Pro User</maintainer>
+  <author email="support@picknik.ai">MoveIt Pro User</author>
 
   <license>TODO</license>
 

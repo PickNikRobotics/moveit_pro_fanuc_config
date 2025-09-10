@@ -11,11 +11,11 @@ namespace actuate_gripper
 class ActuateGripperBehaviorsLoader : public moveit_studio::behaviors::SharedResourcesNodeLoaderBase
 {
 public:
-  void registerBehaviors(BT::BehaviorTreeFactory& factory,
-    [[maybe_unused]] const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources) override
+  void registerBehaviors(
+      BT::BehaviorTreeFactory& factory,
+      [[maybe_unused]] const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources) override
   {
     moveit_studio::behaviors::registerBehavior<ActuateGripper>(factory, "ActuateGripper", shared_resources);
-    
   }
 };
 }  // namespace actuate_gripper

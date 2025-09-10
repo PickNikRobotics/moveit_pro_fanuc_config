@@ -44,7 +44,7 @@ class GPIOGripperNode(Node):
         super().__init__("gpio_gripper_node")
 
         # --- Shared state (guarded) -------------------------------------------------------
-        self._io = defaultdict(dict)   # maps: io_type(int) -> {index(int): value(bool)}
+        self._io = defaultdict(dict)  # maps: io_type(int) -> {index(int): value(bool)}
         self._regs = defaultdict(float)  # maps: index(int) -> value(float)
         self._io_lock = threading.Lock()
         self._io_updated = threading.Event()  # notify waiters that IO changed
@@ -55,15 +55,20 @@ class GPIOGripperNode(Node):
         # Pre-build a reusable IOCmd with 4 BoolIO lines (indices 1..4)
         self._bool_cmd = IOCmd()
         self._bool_cmd.values = [
-            BoolIO(io_type=IOType(type=self._F), index=i + 1, value=False) for i in range(4)
+            BoolIO(io_type=IOType(type=self._F), index=i + 1, value=False)
+            for i in range(4)
         ]
 
         # Callback group so service + subs can run concurrently
         self._cb_group = ReentrantCallbackGroup()
 
         # --- Pubs/Subs --------------------------------------------------------------------
-        self.num_reg_pub = self.create_publisher(NumRegCmd, "/fanuc_gpio_controller/num_reg_cmd", 10)
-        self.bool_io_pub = self.create_publisher(IOCmd, "/fanuc_gpio_controller/io_cmd", 10)
+        self.num_reg_pub = self.create_publisher(
+            NumRegCmd, "/fanuc_gpio_controller/num_reg_cmd", 10
+        )
+        self.bool_io_pub = self.create_publisher(
+            IOCmd, "/fanuc_gpio_controller/io_cmd", 10
+        )
 
         self.io_state_sub = self.create_subscription(
             IOState,
@@ -82,7 +87,10 @@ class GPIOGripperNode(Node):
 
         # --- Service: std_srvs/SetBool(data=True->open, False->close) ---------------------
         self.gripper_srv = self.create_service(
-            SetBool, "/actuate_fanuc_gripper", self.handle_gripper_set, callback_group=self._cb_group
+            SetBool,
+            "/actuate_fanuc_gripper",
+            self.handle_gripper_set,
+            callback_group=self._cb_group,
         )
 
         self.get_logger().info("GPIOGripperNode ready. Service: /gripper/set (SetBool)")
@@ -160,7 +168,10 @@ class GPIOGripperNode(Node):
         # Drive "open" line (index 3) high while not open
         while not self._get_io(self._F, 3, default=False) and rclpy.ok():
             self._set_bool_line(3, True)
-            if self._wait_for(lambda: self._get_io(self._F, 3, default=False), timeout=PUBLISH_PERIOD_SEC):
+            if self._wait_for(
+                lambda: self._get_io(self._F, 3, default=False),
+                timeout=PUBLISH_PERIOD_SEC,
+            ):
                 break  # opened
             if time.time() - t0 > OPEN_TIMEOUT_SEC:
                 self._set_bool_line(3, False)
@@ -175,8 +186,10 @@ class GPIOGripperNode(Node):
         while self._get_io(self._F, 3, default=False) and rclpy.ok():
             # Keep publishing the low state just in case the controller expects it
             self.bool_io_pub.publish(self._bool_cmd)
-            if self._wait_for(lambda: not self._get_io(self._F, 3, default=False),
-                              timeout=PUBLISH_PERIOD_SEC):
+            if self._wait_for(
+                lambda: not self._get_io(self._F, 3, default=False),
+                timeout=PUBLISH_PERIOD_SEC,
+            ):
                 break
 
         self.get_logger().info(f"Open completed in {time.time() - t0:.3f}s")
@@ -191,7 +204,10 @@ class GPIOGripperNode(Node):
         # Drive "close" line (index 2) high while not closed
         while not self._get_io(self._F, 2, default=False) and rclpy.ok():
             self._set_bool_line(2, True)
-            if self._wait_for(lambda: self._get_io(self._F, 2, default=False), timeout=PUBLISH_PERIOD_SEC):
+            if self._wait_for(
+                lambda: self._get_io(self._F, 2, default=False),
+                timeout=PUBLISH_PERIOD_SEC,
+            ):
                 break  # closed
             if time.time() - t0 > CLOSE_TIMEOUT_SEC:
                 self._set_bool_line(2, False)
@@ -205,8 +221,10 @@ class GPIOGripperNode(Node):
         # Ensure command low and input stable
         while self._get_io(self._F, 2, default=False) and rclpy.ok():
             self.bool_io_pub.publish(self._bool_cmd)
-            if self._wait_for(lambda: not self._get_io(self._F, 2, default=False),
-                              timeout=PUBLISH_PERIOD_SEC):
+            if self._wait_for(
+                lambda: not self._get_io(self._F, 2, default=False),
+                timeout=PUBLISH_PERIOD_SEC,
+            ):
                 break
 
         self.get_logger().info(f"Close completed in {time.time() - t0:.3f}s")
@@ -258,4 +276,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(crx_hw_config)
+project(crx_hw)
 
 find_package(ament_cmake REQUIRED)
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <package format="3">
-  <name>crx_hw_config</name>
+  <name>crx_hw</name>
   <version>8.6.0</version>
 
   <description>
@@ -13,7 +13,7 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>crx_mock_config</depend>
+  <depend>crx_mock</depend>
 
   <depend>fanuc_controllers</depend>
   <depend>fanuc_crx_description</depend>

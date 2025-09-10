@@ -3,7 +3,7 @@
 #  This configures the robot to work with MoveIt Pro
 #
 ###############################################################
-based_on_package: "crx_mock_config"
+based_on_package: "crx_mock"
 
 # Baseline hardware configuration parameters for MoveIt Pro.
 # [Required]
@@ -20,11 +20,11 @@ hardware:
     # Many of these are specific to the descriptions packages, and can be customized as needed.
     # [Optional]
     urdf_params:
-      # If you'd like to use a different CRX model, enter in the crx_mock_config (but you can also enter it here using the `robot_model` param).
+      # If you'd like to use a different CRX model, enter in the crx_mock (but you can also enter it here using the `robot_model` param).
       - robot_ip: "192.168.1.100"
       - rmi_port: "16001"
       - stream_motion_port: "60015"
-      - gpio_configuration: "$(find crx_hw_config)/config/control/gpio_config.yaml"
+      - gpio_configuration: "$(find crx_hw)/config/control/gpio_config.yaml"
       - use_mock: "false"
 
 # Sets ROS global params for launch.
@@ -38,7 +38,7 @@ ros_global_params:
 # [Required, if using ros2_control]
 ros2_control:
   config:
-    package: "crx_hw_config"
+    package: "crx_hw"
     path: "config/control/ros2_control.yaml"
   # MoveIt Pro will load and activate these controllers at start up to ensure they are available.
   # If not specified, it is up to the user to ensure the appropriate controllers are active and available
@@ -67,8 +67,8 @@ objectives:
       package_name: "moveit_pro_objectives"
       relative_path: "objectives/perception"
     mock_objectives:
-      package_name: "crx_mock_config"
+      package_name: "crx_mock"
       relative_path: "objectives"
     hw_objectives:
-      package_name: "crx_hw_config"
+      package_name: "crx_hw"
       relative_path: "objectives"

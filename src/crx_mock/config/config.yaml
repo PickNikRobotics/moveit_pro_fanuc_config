@@ -32,10 +32,10 @@ hardware:
   # [Required]
   robot_description:
     urdf:
-      package: "crx_mock_config"
+      package: "crx_mock"
       path: "description/fanuc_crx.urdf.xacro"
     srdf:
-      package: "crx_mock_config"
+      package: "crx_mock"
       path: "config/moveit/fanuc_crx.srdf"
     # Specify any additional parameters required for the URDF.
     # Many of these are specific to the descriptions packages, and can be customized as needed.
@@ -62,25 +62,25 @@ moveit_params:
   joint_group_name: "manipulator"
 
   ompl_planning:
-    package: "crx_mock_config"
+    package: "crx_mock"
     path: "config/moveit/ompl_planning.yaml"
   stomp_planning:
-    package: "crx_mock_config"
+    package: "crx_mock"
     path: "config/moveit/stomp_planning.yaml"
   kinematics:
-    package: "crx_mock_config"
+    package: "crx_mock"
     path: "config/moveit/pose_ik_distance.yaml"
   servo:
-    package: "crx_mock_config"
+    package: "crx_mock"
     path: "config/moveit/servo.yaml"
   joint_limits:
-    package: "crx_mock_config"
+    package: "crx_mock"
     path: "config/moveit/joint_limits.yaml"
   servo_joint_limits:
-    package: "crx_mock_config"
+    package: "crx_mock"
     path: "config/moveit/joint_limits_servo.yaml"
   pose_jog:
-    package: "crx_mock_config"
+    package: "crx_mock"
     path: "config/moveit/pose_jog.yaml"
 
   publish:
@@ -99,7 +99,7 @@ moveit_params:
 # [Required, if using ros2_control]
 ros2_control:
   config:
-    package: "crx_mock_config"
+    package: "crx_mock"
     path: "config/control/ros2_control.yaml"
   # MoveIt Pro will load and activate these controllers at start up to ensure they are available.
   # If not specified, it is up to the user to ensure the appropriate controllers are active and available
@@ -140,10 +140,10 @@ objectives:
       package_name: "moveit_pro_objectives"
       relative_path: "objectives/perception"
     mock_objectives:
-      package_name: "crx_mock_config"
+      package_name: "crx_mock"
       relative_path: "objectives"
   # Specify the location of the saved waypoints file.
   # [Required]
   waypoints_file:
-    package_name: "crx_mock_config"
+    package_name: "crx_mock"
     relative_path: "waypoints/waypoints.yaml"

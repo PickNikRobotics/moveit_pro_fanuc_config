@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <package format="3">
-  <name>crx_mock_config</name>
+  <name>crx_mock</name>
   <version>8.6.0</version>
 
   <description>

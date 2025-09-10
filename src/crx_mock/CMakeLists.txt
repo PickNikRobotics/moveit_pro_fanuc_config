@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(crx_mock_config)
+project(crx_mock)
 
 find_package(ament_cmake REQUIRED)
 

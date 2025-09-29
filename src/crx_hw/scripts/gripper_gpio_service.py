@@ -127,6 +127,8 @@ class GPIOGripperNode(Node):
 
     def activate(self):
         """Drive output 1 high until input F[1] is true, then release."""
+        if self._get_io(self._F, 1, default=False):
+            return
         # NOTE: Your original code read self.io["F"][1], but the key is an int IO type.
         self.get_logger().info("Attempting to set bool register 1 to true...")
         while not self._get_io(self._F, 1, default=False) and rclpy.ok():
@@ -143,6 +145,7 @@ class GPIOGripperNode(Node):
         req.data == False -> CLOSE
         Returns success True/False based on timeout.
         """
+        self.activate()
         try:
             if req.data:
                 ok = self.open()

@@ -5,23 +5,11 @@ from collections import defaultdict
 
 import rclpy
 from rclpy.node import Node
-from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.callback_groups import ReentrantCallbackGroup, MutuallyExclusiveCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 
 from std_srvs.srv import SetBool  # True=open, False=close
 
-from fanuc_msgs.srv import (
-    SetBoolIO,
-    SetAnalogIO,
-    SetGroupIO,
-    SetNumReg,
-    SetGenOverride,
-    GetBoolIO,
-    GetAnalogIO,
-    GetGroupIO,
-    GetNumReg,
-    SetPayloadID,
-)
 from fanuc_msgs.msg import (
     IOType,
     IOCmd,
@@ -37,6 +25,8 @@ OPEN_TIMEOUT_SEC = 5.0
 CLOSE_TIMEOUT_SEC = 5.0
 AFTER_MOVE_SETTLE_SEC = 1.0
 PUBLISH_PERIOD_SEC = 0.01
+
+ACTUATE_FANUC_GRIPPER_SERVICE_NAME = "/actuate_fanuc_gripper"
 
 
 class GPIOGripperNode(Node):
@@ -64,10 +54,13 @@ class GPIOGripperNode(Node):
 
         # --- Pubs/Subs --------------------------------------------------------------------
         self.num_reg_pub = self.create_publisher(
-            NumRegCmd, "/fanuc_gpio_controller/num_reg_cmd", 10
+            NumRegCmd,
+            "/fanuc_gpio_controller/num_reg_cmd",
+            10,
+            callback_group=self._cb_group,
         )
         self.bool_io_pub = self.create_publisher(
-            IOCmd, "/fanuc_gpio_controller/io_cmd", 10
+            IOCmd, "/fanuc_gpio_controller/io_cmd", 10, callback_group=self._cb_group
         )
 
         self.io_state_sub = self.create_subscription(
@@ -75,32 +68,39 @@ class GPIOGripperNode(Node):
             "/fanuc_gpio_controller/io_state",
             self.io_state_callback,
             10,
-            callback_group=self._cb_group,
+            callback_group=MutuallyExclusiveCallbackGroup(),
         )
         self.num_reg_state_sub = self.create_subscription(
             NumRegState,
             "/fanuc_gpio_controller/num_reg_state",
             self.num_reg_state_callback,
             10,
-            callback_group=self._cb_group,
+            callback_group=MutuallyExclusiveCallbackGroup(),
         )
 
         # --- Service: std_srvs/SetBool(data=True->open, False->close) ---------------------
         self.gripper_srv = self.create_service(
             SetBool,
-            "/actuate_fanuc_gripper",
+            ACTUATE_FANUC_GRIPPER_SERVICE_NAME,
             self.handle_gripper_set,
             callback_group=self._cb_group,
         )
 
-        self.get_logger().info("GPIOGripperNode ready. Service: /gripper/set (SetBool)")
+        # Initialization that must happen on the executor.
+        self._on_init_timer = self.create_timer(
+            1, self.on_init, callback_group=self._cb_group
+        )
+
+        self.get_logger().info(
+            f"GPIOGripperNode ready. Service: {ACTUATE_FANUC_GRIPPER_SERVICE_NAME} (SetBool)"
+        )
 
     # -------------------------- Subscriptions ---------------------------------------------
 
     def io_state_callback(self, msg: IOState):
         with self._io_lock:
             for io_val in msg.values:
-                self._io[io_val.io_type.type][io_val.index] = bool(io_val.value)
+                self._io[io_val.io_type.type][io_val.index] = io_val.value
         self._io_updated.set()
 
     def num_reg_state_callback(self, msg: NumRegState):
@@ -109,6 +109,12 @@ class GPIOGripperNode(Node):
                 self._regs[reg.index] = float(reg.value)
 
     # -------------------------- Initialization --------------------------------------------
+
+    def on_init(self):
+        self.initialize_gpio()
+        self.get_logger().info("Activating the gripper.")
+        self.activate()
+        self.destroy_timer(self._on_init_timer)
 
     def initialize_gpio(self):
         """Set initial num-reg values as in your original code."""
@@ -127,12 +133,11 @@ class GPIOGripperNode(Node):
 
     def activate(self):
         """Drive output 1 high until input F[1] is true, then release."""
-        if self._get_io(self._F, 1, default=False):
-            return
         # NOTE: Your original code read self.io["F"][1], but the key is an int IO type.
         self.get_logger().info("Attempting to set bool register 1 to true...")
         while not self._get_io(self._F, 1, default=False) and rclpy.ok():
-            self._set_bool_line(1, False)
+            # self.get_logger().info("GPIO Gripper still waiting on value update.")
+            self._set_bool_line(1, True)
             time.sleep(PUBLISH_PERIOD_SEC)
         self._set_bool_line(1, False)
         self.get_logger().info("Activation successful: able to set bool register.")
@@ -145,7 +150,6 @@ class GPIOGripperNode(Node):
         req.data == False -> CLOSE
         Returns success True/False based on timeout.
         """
-        self.activate()
         try:
             if req.data:
                 ok = self.open()
@@ -186,7 +190,7 @@ class GPIOGripperNode(Node):
         time.sleep(AFTER_MOVE_SETTLE_SEC)
 
         # Ensure the command is truly low and the state remains open
-        while self._get_io(self._F, 3, default=False) and rclpy.ok():
+        while self._get_io(self._F, 3, default=True) and rclpy.ok():
             # Keep publishing the low state just in case the controller expects it
             self.bool_io_pub.publish(self._bool_cmd)
             if self._wait_for(
@@ -222,7 +226,7 @@ class GPIOGripperNode(Node):
         time.sleep(AFTER_MOVE_SETTLE_SEC)
 
         # Ensure command low and input stable
-        while self._get_io(self._F, 2, default=False) and rclpy.ok():
+        while self._get_io(self._F, 2, default=True) and rclpy.ok():
             self.bool_io_pub.publish(self._bool_cmd)
             if self._wait_for(
                 lambda: not self._get_io(self._F, 2, default=False),
@@ -239,12 +243,12 @@ class GPIOGripperNode(Node):
         """Set the Nth BoolIO line value and publish."""
         # indices are 1-based in your original code (1..4)
         assert 1 <= index <= 4
-        self._bool_cmd.values[index - 1].value = bool(value)
+        self._bool_cmd.values[index - 1].value = value
         self.bool_io_pub.publish(self._bool_cmd)
 
-    def _get_io(self, io_type_int: int, index: int, default=False) -> bool:
+    def _get_io(self, io_type: str, index: int, default: bool = False) -> bool:
         with self._io_lock:
-            return bool(self._io.get(io_type_int, {}).get(index, default))
+            return self._io.get(io_type, {}).get(index, default)
 
     def _wait_for(self, predicate, timeout: float) -> bool:
         """
@@ -262,7 +266,6 @@ class GPIOGripperNode(Node):
 def main():
     rclpy.init()
     node = GPIOGripperNode()
-    node.initialize_gpio()
 
     # Multi-threaded executor + reentrant callbacks allow
     # subscriber callbacks to run while the service is blocking/waiting.

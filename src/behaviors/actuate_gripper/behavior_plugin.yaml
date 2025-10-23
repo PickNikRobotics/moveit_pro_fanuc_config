@@ -1,0 +1,4 @@
+objectives:
+  behavior_loader_plugins:
+    actuate_gripper:
+      - "actuate_gripper::ActuateGripperBehaviorsLoader"

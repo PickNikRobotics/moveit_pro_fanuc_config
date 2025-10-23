@@ -3,4 +3,10 @@
   <include
     file="$(find-pkg-share moveit_studio_agent)/launch/studio_agent_bridge.launch.xml"
   />
+  <node
+    pkg="crx_hw"
+    exec="gripper_gpio_service"
+    name="gripper_gpio_service"
+    output="screen"
+  />
 </launch>

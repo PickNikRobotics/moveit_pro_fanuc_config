@@ -12,6 +12,11 @@ install(
     share/${PROJECT_NAME}
 )
 
+# Install the Python script as a “binary” in lib/<pkg>
+install(PROGRAMS scripts/gripper_gpio_service.py
+    DESTINATION lib/${PROJECT_NAME}
+    RENAME gripper_gpio_service)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()

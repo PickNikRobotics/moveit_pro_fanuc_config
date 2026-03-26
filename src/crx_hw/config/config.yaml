@@ -52,7 +52,7 @@ ros2_control:
   # [Optional, default=[]]
   controllers_inactive_at_startup:
     - "velocity_force_controller"
-    - "servo_controller"
+    - "joint_velocity_controller"
 # Configuration for loading behaviors and objectives.
 # [Required]
 objectives:

@@ -5,10 +5,10 @@ controller_manager:
       type: joint_state_broadcaster/JointStateBroadcaster
     joint_trajectory_controller:
       type: fanuc_controllers/ScaledJointTrajectoryController
-    servo_controller:
-      type: fanuc_controllers/ScaledJointTrajectoryController
     velocity_force_controller:
       type: velocity_force_controller/VelocityForceController
+    joint_velocity_controller:
+      type: joint_velocity_controller/JointVelocityController
     fanuc_gpio_controller:
       type: fanuc_controllers/FanucGPIOController
 
@@ -51,38 +51,6 @@ joint_trajectory_controller:
       J6:
         goal: 0.05
         trajectory: 0.25
-
-servo_controller:
-  ros__parameters:
-    joints:
-      - J1
-      - J2
-      - J3
-      - J4
-      - J5
-      - J6
-    command_interfaces:
-      - position
-    state_interfaces:
-      - position
-    state_publish_rate: 100.0
-    action_monitor_rate: 20.0
-    allow_partial_joints_goal: false
-    constraints:
-      stopped_velocity_tolerance: 0.0
-      goal_time: 0.0
-      J1:
-        goal: 0.05
-      J2:
-        goal: 0.05
-      J3:
-        goal: 0.05
-      J4:
-        goal: 0.05
-      J5:
-        goal: 0.05
-      J6:
-        goal: 0.05
 
 velocity_force_controller:
   ros__parameters:
@@ -133,3 +101,32 @@ velocity_force_controller:
     command_timeout: 0.2
     # Padding (in radians) to add to joint position limits as a safety margin.
     joint_limit_position_tolerance: 0.02
+
+joint_velocity_controller:
+  ros__parameters:
+    # Joint group to control.
+    planning_group_name: manipulator
+    # Maximum joint-space velocities (rad/s) - one value per joint.
+    max_joint_velocity:
+      - 1.0
+      - 1.0
+      - 1.0
+      - 1.0
+      - 1.0
+      - 1.0
+    # Maximum joint-space accelerations (rad/s^2) - one value per joint.
+    max_joint_acceleration:
+      - 2.0
+      - 2.0
+      - 2.0
+      - 2.0
+      - 2.0
+      - 2.0
+    # Command interface type: "position" or "velocity".
+    command_interfaces: ["position"]
+    # Safety margin for joint position limits (radians).
+    joint_limit_position_tolerance: 0.02
+    # Timeout after which controller stops if no commands received (seconds).
+    command_timeout: 0.2
+    # Controller state publishing rate (Hz).
+    state_publish_rate: 20

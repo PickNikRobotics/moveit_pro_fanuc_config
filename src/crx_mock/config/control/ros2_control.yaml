@@ -9,6 +9,8 @@ controller_manager:
       type: velocity_force_controller/VelocityForceController
     joint_velocity_controller:
       type: joint_velocity_controller/JointVelocityController
+    joint_trajectory_admittance_controller:
+      type: joint_trajectory_admittance_controller/JointTrajectoryAdmittanceController
     fanuc_gpio_controller:
       type: fanuc_controllers/FanucGPIOController
 
@@ -130,3 +132,17 @@ joint_velocity_controller:
     command_timeout: 0.2
     # Controller state publishing rate (Hz).
     state_publish_rate: 20
+
+joint_trajectory_admittance_controller:
+  ros__parameters:
+    planning_group_name: manipulator
+    sensor_frame: grasp_link
+    ee_frame: grasp_link
+    # No FT sensor on CRX - controller runs without admittance.
+    ft_sensor_name: ""
+    stop_accelerations: [30.0, 30.0, 30.0, 30.0, 30.0, 30.0]
+    ft_cutoff_frequency_ratio: 1.0
+    ft_force_deadband: 0.0
+    ft_torque_deadband: 0.0
+    state_publish_rate: 50
+    jacobian_damping: 0.01

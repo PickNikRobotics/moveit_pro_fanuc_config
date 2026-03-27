@@ -1,0 +1,39 @@
+diff --git a/fanuc_hardware_interface/CMakeLists.txt b/fanuc_hardware_interface/CMakeLists.txt
+index 4114853..ca451e6 100644
+--- a/fanuc_hardware_interface/CMakeLists.txt
++++ b/fanuc_hardware_interface/CMakeLists.txt
+@@ -20,7 +20,7 @@ find_package(fanuc_libs REQUIRED)
+ 
+ add_library(fanuc_robot_driver SHARED src/hardware_interface.cpp)
+ target_link_libraries(fanuc_robot_driver PUBLIC
+-  ${hardware_interface_LIBRARIES}
++  hardware_interface::hardware_interface
+   pluginlib::pluginlib
+   fanuc_libs::rmi
+   fanuc_libs::stream_motion
+@@ -31,8 +31,6 @@ target_include_directories(fanuc_robot_driver PUBLIC
+     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+     $<INSTALL_INTERFACE:include>
+ )
+-target_include_directories(fanuc_robot_driver PRIVATE ${hardware_interface_INCLUDE_DIRS})
+-target_include_directories(fanuc_robot_driver PUBLIC include)
+ 
+ pluginlib_export_plugin_description_file(hardware_interface hardware_interface_plugin.xml)
+ 
+diff --git a/fanuc_moveit_config/src/fanuc_controllers_moveit_trajectory_plugin.cpp b/fanuc_moveit_config/src/fanuc_controllers_moveit_trajectory_plugin.cpp
+index f127bef..d7f7468 100644
+--- a/fanuc_moveit_config/src/fanuc_controllers_moveit_trajectory_plugin.cpp
++++ b/fanuc_moveit_config/src/fanuc_controllers_moveit_trajectory_plugin.cpp
+@@ -22,9 +22,9 @@ namespace moveit_ros_control_interface
+ class ScaledJointTrajectoryControllerAllocator final : public ControllerHandleAllocator
+ {
+ public:
+-  moveit_controller_manager::MoveItControllerHandlePtr alloc(const rclcpp::Node::SharedPtr& node,
+-                                                             const std::string& name,
+-                                                             const std::vector<std::string>& /* resources */) override
++  moveit_pro::base::controller_manager::MoveItControllerHandlePtr alloc(const rclcpp::Node::SharedPtr& node,
++                                                                        const std::string& name,
++                                                                        const std::vector<std::string>& /* resources */) override
+   {
+     return std::make_shared<moveit_simple_controller_manager::FollowJointTrajectoryControllerHandle>(
+         node, name, "follow_joint_trajectory");

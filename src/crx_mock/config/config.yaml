@@ -14,7 +14,7 @@ hardware:
   # If simulated is false, launch the following file:
   # [Optional, defaults to a blank launch file if not specified]
   robot_driver_persist_launch_file:
-    package: "moveit_pro_agent"
+    package: "moveit_studio_agent"
     path: "launch/blank.launch.py"
 
   # If the MoveIt Pro Agent should launch the ros2 controller node.
@@ -108,6 +108,7 @@ ros2_control:
   controllers_active_at_startup:
     - "joint_state_broadcaster"
     - "joint_trajectory_controller"
+    - "joint_trajectory_admittance_controller"
   # Load but do not start these controllers so they can be activated later if needed.
   # [Optional, default=[]]
   controllers_inactive_at_startup:

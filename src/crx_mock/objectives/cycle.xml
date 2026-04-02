@@ -17,6 +17,7 @@
           seed="0"
           velocity_scale_factor="1.0"
           waypoint_name="Up"
+          execution_pipeline="jtc"
         />
         <SubTree
           ID="Move to Waypoint"
@@ -31,6 +32,7 @@
           seed="0"
           velocity_scale_factor="1.0"
           waypoint_name="Home"
+          execution_pipeline="jtc"
         />
         <Action ID="AlwaysFailure" />
       </Control>
